@@ -8,41 +8,36 @@ import (
 )
 
 func FastInverseSqrt(x float32) float32 {
+	const threehalfs = float32(1.5)
+
 	x2 := x * float32(0.5)
-  y := x
-
-	 i := *(*int32)(unsafe.Pointer(&y))
-	 i = 0x5f3759df - i>>1
-	 y = *(*float32)(unsafe.Pointer(&i))
-
-	 y = y * (float32(1.5) - (x2 * y * y))
-	 return y 
+	y := x
+	i := *(*int32)(unsafe.Pointer(&y))
+	i = 0x5f3759df - i>>1
+	y = *(*float32)(unsafe.Pointer(&i))
+	y = y * (threehalfs - (x2 * y * y))
+	return y
 }
-
-func FastInverseSqrt2(x float32) float32 {
-	return float32(1.0 / math.Sqrt(float64(x)))
-}
-
-
 
 func TestFastInverseSqrt(t *testing.T) {
-	datas := []struct{
-		in float32
+	tests := []struct {
+		in, out float32
+		e       float32
 	}{
-	  {2.0},
-	  {3.0},
-	  {4.0},
-	  {5.0},
-  }
-  for _, tt := range datas {
-	  t.Run(fmt.Sprintf("1/√%.2f", tt.in), func(t *testing.T){
-		  result1 := FastInverseSqrt(tt.in)
-		  result2 := FastInverseSqrt2(tt.in)
-      //計算誤差がおおきればエラーを出す
-      e := math.Abs(float64(result1 - result2))
-      if 1e-3 < e  {
-			 t.Errorf("something wrong")
-		  }
-	  })
-  }
+		{2.0, 1.0/1.414, 1e-3},
+		{3.0, 1.0/1.732, 1e-3},
+		{5.0, 1.0/2.236, 1e-3},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(fmt.Sprintf("1/√%.2f", tt.in), func(t *testing.T) {
+			result := FastInverseSqrt(tt.in)
+			e := float32(math.Abs(float64(result - tt.out)))
+			if tt.e < e {
+				t.Errorf("want %f, but got %f", tt.out, result)
+			}
+		})
+
+	}
 }
