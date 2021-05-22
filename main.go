@@ -24,9 +24,9 @@ func TestFastInverseSqrt(t *testing.T) {
 		in, out float32
 		e       float32
 	}{
-		{2.0, 1.0/1.414, 1e-3},
-		{3.0, 1.0/1.732, 1e-3},
-		{5.0, 1.0/2.236, 1e-3},
+		{2.0, 1.0 / 1.414, 1e-3},
+		{3.0, 1.0 / 1.732, 1e-3},
+		{5.0, 1.0 / 2.236, 1e-3},
 	}
 
 	for _, tt := range tests {
